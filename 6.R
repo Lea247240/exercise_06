@@ -1,3 +1,4 @@
+rm(list=ls())
 
 #Cesta:
 setwd('V:/MPA_PRG/exercise_06')
@@ -21,7 +22,7 @@ setwd('D:/VUT/4-5rocnik/moje/MPA-PRG/exercise_06') # home
 
 # Modify it to search through all possible arrangements of fragments.
 
-enzymeA <- c(2,3,5,10)
+enzymeA <- c(2,3,10,5)
 enzymeB <- c(3,7,10)
 enzymeAB <- c(1,2,2,5,5,5)
 
@@ -49,6 +50,12 @@ for (i in (1:(length(enzymeB)-1))){
 combined <- c(position_mapA,position_mapB)
 combined_position <- unique(combined)
 combined_positoin_sort <- sort(combined_position)
+combined_position_diff <- diff(combined_positoin_sort)
+combined_position_diff_sort <- sort(combined_position_diff)
+
+if (all(combined_position_diff_sort == enzymeAB)){
+  print('i')
+}
 
 positionA <- position_mapA[2:length(enzymeA)]
 positionB <- position_mapB[2:length(enzymeB)]
@@ -58,35 +65,40 @@ result <- list()
 result<- list(positionA, positionB)
 
 
+
 # pokus
 range(1:3)
 (length(enzymeA))-1
 enzymeA[1]
 
 # -----------funstion----------------------------
+
 DoubleDigestProblem <- function(enzymeA, enzymeB, enzymeAB){
+  
   position_mapA <- c(0, enzymeA[1])
   position_mapB <- c(0, enzymeB[1])
   
   for (i in (1:(length(enzymeA)-1))){
     
-    sum <- sum(enzymeA[1:i])
-    number <- sum+enzymeA[i+1]
+    s <- sum(enzymeA[1:i])
+    number <- s+enzymeA[i+1]
     position_mapA <- c(position_mapA, number)
   }
   
   for (i in (1:(length(enzymeB)-1))){
     
-    sum <- sum(enzymeB[1:i])
-    number <- sum+enzymeB[i+1]
+    s <- sum(enzymeB[1:i])
+    number <- s+enzymeB[i+1]
     position_mapB <- c(position_mapB, number)
   }
   
   combined <- c(position_mapA,position_mapB)
   combined_position <- unique(combined)
   combined_positoin_sort <- sort(combined_position)
+  combined_position_diff <- diff(combined_positoin_sort)
+  combined_position_diff_sort <- sort(combined_position_diff)
   
-  if (combined_positoin_sort == enzymeAB){
+  if (all(combined_position_diff_sort == enzymeAB)){
     positionA <- position_mapA[2:length(enzymeA)]
     positionB <- position_mapB[2:length(enzymeB)]
     result <- list(positionA,positionB)
@@ -130,11 +142,29 @@ DoubleDigestProblem(enzymeA,enzymeB, enzymeAB)
 #12    remove width - y from X and add the lengths Δ(width - y, X) to deltaX
 #13  return
 #####################################################################
+rm(list=ls())
 
 deltaX<- c(2,2,3,3,4,5,6,7,8,10)
 X <- list('x1','x2','x3', 'x4', 'x5')
-width <- max(deltaX)
+X[1] <- 0 # initialization all x1 = 0
+#..................................................
 
+
+
+width <- max(deltaX) # nejvetsi cislo z daltaX
+y <- width - X[[1]] #pokazde pocitame x5-x1, x4-x1, x3-x1, x2-x1 (cislo ktere pak dame do listu X)
+number <- unlist(Filter(is.numeric, X)) #vybereme z listu jen cisla
+delta_xy <- abs(y - number) #vypocitame useky mezi nasim novym cislem a temi ktere uz mame v listu X
+#delta_xy <- abs(diff(delta_xy)) # rozdil mezi nimi (ty oblackove sipky)
+
+X[3] <- y #na konec listu pridame to y
+deltaX <- deltaX[deltaX != delta_xy] #odstarnime to co jsme pouzili (oblackove sipky)
+
+# ........
+
+for (i in(1:length(X))){
+  
+}
 # indexace + pridani do listu (pridani prvnich hodnot)
 X[[1]] <- 0
 X[[length(X)]] <- max(deltaX)
@@ -152,13 +182,113 @@ Place <- function(deltaX,X,width){
   }
   y <-  max(deltaX)
   
-  if (){
+  number <- unlist(Filter(is.numeric, X))
+  delta_xy <- abs(y - number) 
+  if (all(delta_xy %in% deltaX)){
     
+    X[length(X)] <- y 
+    deltaX <- deltaX[deltaX != delta_xy]
+    
+    Place(deltaX, X, width)
+    
+    idx <- which(sapply(X, function(x) identical(x, y)))
+    X <- X[-idx] #remove y from X
+    deltaX <- lenght(delta_xy)
   }
+  
+  delta_w <- width-y
+  delta_w <- abs(delta_w - number) 
+  if (all(delta_w%in% deltaX)){
+    
+    X[length(X)] <- width - y
+    deltaX <- deltaX[deltaX != delta_w]
+    
+    Place(deltaX, X, width)
+    
+    z <- width - y
+    idx <- which(sapply(X, function(x) identical(x, z)))
+    X <- X[-idx] #remove width - y from X
+    deltaX <- lenght(delta_w)
+  }
+  return(X)
 }
 
+#.....................................................................chtgpt
 
+rm(list=ls())
 
+deltaX<- c(2,2,3,3,4,5,6,7,8,10)
+X <- c(0) # initialization all x1 = 0
+width <- max(deltaX)
+# .................................................
 
+# Pomocna funkce: Δ(y, X)
+Delta <- function(y, X) {
+  return(abs(y - X))
+}
+
+# Pomocna funkce: odstraní délky z deltaX
+Remove <- function(deltaX, lengths) {
+  for (len in lengths) {
+    idx <- match(len, deltaX)
+    if (!is.na(idx)) deltaX <- deltaX[-idx]
+  }
+  return(deltaX)
+}
+
+# Hlavni rekurzivni funkce Place
+Place <- function(deltaX, X, width) {
+  # 1-2. Pokud je deltaX prazdny, vystup X
+  if (length(deltaX) == 0) {
+    print(sort(X))  # vypise aktualni reseni
+    return()
+  }
+  
+  # 4. y ← maximum z deltaX
+  y <- max(deltaX)
+  
+  # 5-8. Vetev s y
+  deltaY <- Delta(y, X)
+  if (all(deltaY %in% deltaX)) {
+    X1 <- c(X, y)
+    deltaX1 <- Remove(deltaX, deltaY)
+    Place(deltaX1, X1, width)  # rekurzivni volání pouze uvnitr if
+  }
+  
+  # 9-12. Vetev s width - y
+  y2 <- width - y
+  deltaY2 <- Delta(y2, X)
+  if (all(deltaY2 %in% deltaX)) {
+    X2 <- c(X, y2)
+    deltaX2 <- Remove(deltaX, deltaY2)
+    Place(deltaX2, X2, width)  # rekurzivni volani pouze uvnitr if
+  }
+  
+  # 13. return
+  return()
+}
+Place(deltaX, X, width)
+
+### Task 3
+# In R, implement a function `PartialDigestProblem()` according to the following pseudocode.
+
+# Input:
+  #`deltaX` A multiset of fragments lengths.
+
+####################################################################
+#PartialDigestProblem(deltaX)
+#1   width ← the maximum element from deltaX
+#2   delete the maximum element from deltaX
+#3   X ← {0, width}
+#4   Place(deltaX, X, width)
+
+# resi inicializaci funkce Place() + jeji volani
+PartialDigestProblem <- function(deltaX){
+  width <- max(deltaX)
+  deltaX = deltaX[deltaX != width] #!= bez toho width
+  X <- c(0,width)
+  Place(deltaX, X, width)
+}
+PartialDigestProblem(deltaX<- c(2,2,3,3,4,5,6,7,8,10))
 
 
