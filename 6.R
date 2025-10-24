@@ -148,8 +148,7 @@ deltaX<- c(2,2,3,3,4,5,6,7,8,10)
 X <- list('x1','x2','x3', 'x4', 'x5')
 X[1] <- 0 # initialization all x1 = 0
 #..................................................
-
-
+#zkouska 
 
 width <- max(deltaX) # nejvetsi cislo z daltaX
 y <- width - X[[1]] #pokazde pocitame x5-x1, x4-x1, x3-x1, x2-x1 (cislo ktere pak dame do listu X)
@@ -160,11 +159,6 @@ delta_xy <- abs(y - number) #vypocitame useky mezi nasim novym cislem a temi kte
 X[3] <- y #na konec listu pridame to y
 deltaX <- deltaX[deltaX != delta_xy] #odstarnime to co jsme pouzili (oblackove sipky)
 
-# ........
-
-for (i in(1:length(X))){
-  
-}
 # indexace + pridani do listu (pridani prvnich hodnot)
 X[[1]] <- 0
 X[[length(X)]] <- max(deltaX)
@@ -172,48 +166,7 @@ deltayx <- X[[length(X)]] - X[[1]]
 
 deltaX <- c(deltaX, deltayx)
 
-
-
-#--------------------function--------------
-Place <- function(deltaX,X,width){
-  if (length(deltaX) == 0){
-    output <-  X
-    return(output)
-  }
-  y <-  max(deltaX)
-  
-  number <- unlist(Filter(is.numeric, X))
-  delta_xy <- abs(y - number) 
-  if (all(delta_xy %in% deltaX)){
-    
-    X[length(X)] <- y 
-    deltaX <- deltaX[deltaX != delta_xy]
-    
-    Place(deltaX, X, width)
-    
-    idx <- which(sapply(X, function(x) identical(x, y)))
-    X <- X[-idx] #remove y from X
-    deltaX <- lenght(delta_xy)
-  }
-  
-  delta_w <- width-y
-  delta_w <- abs(delta_w - number) 
-  if (all(delta_w%in% deltaX)){
-    
-    X[length(X)] <- width - y
-    deltaX <- deltaX[deltaX != delta_w]
-    
-    Place(deltaX, X, width)
-    
-    z <- width - y
-    idx <- which(sapply(X, function(x) identical(x, z)))
-    X <- X[-idx] #remove width - y from X
-    deltaX <- lenght(delta_w)
-  }
-  return(X)
-}
-
-#.....................................................................chtgpt
+#........................................................finish function
 
 rm(list=ls())
 
